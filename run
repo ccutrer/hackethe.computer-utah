@@ -4,7 +4,7 @@
 require 'set'
 
 class Cube
-  attr_reader :canonicals, :faces
+  attr_reader :canonical, :faces
 
   def initialize(net)
     @width, @height, @multiplier = self.class.infer_multiplier(net)
@@ -12,7 +12,6 @@ class Cube
     x = (@width - 1) / 2
     y = (@height  - 1) / 2
 
-   # debugger
     @faces = {}
     @faces[:top] = extract_face(net, x, y)
     # given top as center (B = Back, b = Bottom, X = bottom OR another, depending on how you got there):
@@ -65,13 +64,13 @@ class Cube
         @faces[:bottom] ||= rotate_face(extract_face(net, x - 1, y + 2), :counterclockwise) # checked
       end
       if right3
-        @faces[:back] ||= rotate_face(extract_face(net, x + 2, y + 1), :confused)
-        @faces[:bottom] ||= rotate_face(extract_face(net, x + 1, y + 2), :confused)
+        @faces[:back] ||= extract_face(net, x + 2, y + 1) # checked
+        @faces[:bottom] ||= rotate_face(extract_face(net, x + 1, y + 2), :clockwise) # checked
       end
     end
     #  R L
     # XB BX
-    # bLTRbL
+    # bLTRb
     # XF FX
     #  R L
     if left1
@@ -79,16 +78,16 @@ class Cube
       @faces[:back] ||= back4 = rotate_face(extract_face(net, x - 1, y - 1), :counterclockwise) # checked
       @faces[:front] ||= front4 = rotate_face(extract_face(net, x - 1, y + 1), :counterclockwise) # checked
       if bottom4
-        @faces[:back] ||= rotate_face(extract_face(net, x - 2, y - 1), :confused)
-        @faces[:front] ||= rotate_face(extract_face(net, x - 2, y + 1), :confused)
+        @faces[:back] ||= extract_face(net, x - 2, y - 1) # checked
+        @faces[:front] ||= rotate_face(extract_face(net, x - 2, y + 1), :half) # checked
       end
       if back4
-        @faces[:right] ||= rotate_face(extract_face(net, x - 1, y - 2), :confused)
-        @faces[:bottom] ||= rotate_face(extract_face(net, x - 2, y - 1), :confused)
+        @faces[:right] ||= rotate_face(extract_face(net, x - 1, y - 2), :counterclockwise) # checked
+        @faces[:bottom] ||= rotate_face(extract_face(net, x - 2, y - 1), :clockwise) # checked
       end
       if front4
-        @faces[:right] ||= rotate_face(extract_face(net, x - 2, y + 2), :confused)
-        @faces[:bottom] ||= rotate_face(extract_face(net, x - 2, y + 1), :confused)
+        @faces[:right] ||= rotate_face(extract_face(net, x - 1, y + 2), :counterclockwise) # checked
+        @faces[:bottom] ||= rotate_face(extract_face(net, x - 2, y + 1), :counterclockwise) # checked
       end
     end
     if right1
@@ -96,51 +95,35 @@ class Cube
       @faces[:back] ||= back5 = rotate_face(extract_face(net, x + 1, y - 1), :clockwise) # checked
       @faces[:front] ||= front5 = rotate_face(extract_face(net, x + 1, y + 1), :clockwise) # checked
       if bottom5
-        @faces[:back] ||= rotate_face(extract_face(net, x + 2, y - 1), :confused)
-        @faces[:front] ||= rotate_face(extract_face(net, x + 2, y + 1), :confused)
+        @faces[:back] ||= extract_face(net, x + 2, y - 1) # checked
+        @faces[:front] ||= rotate_face(extract_face(net, x + 2, y + 1), :half) # checked
       end
       if back5
-        @faces[:left] ||= rotate_face(extract_face(net, x + 2, y - 2), :confused)
+        @faces[:left] ||= rotate_face(extract_face(net, x + 1, y - 2), :clockwise) # checked
         @faces[:bottom] ||= rotate_face(extract_face(net, x + 2, y - 1), :counterclockwise) # checked
       end
       if front5
-        @faces[:left] ||= rotate_face(extract_face(net, x + 1, y + 2), :confused)
-        @faces[:bottom] ||= rotate_face(extract_face(net, x + 2, y + 1), :confused)
+        @faces[:left] ||= rotate_face(extract_face(net, x + 1, y + 2), :clockwise) # checked
+        @faces[:bottom] ||= rotate_face(extract_face(net, x + 2, y + 1), :clockwise) # checked
       end
     end
 
-    scores = @faces.map { |name, face| [name, self.class.score_face(face)] }.sort_by(&:last)
-
-    target_tops = scores.select { |(_name, score)| score == scores.first.last}.map(&:first)
-
-    canonicals = target_tops.map do |target|
-      cube = dup
-      case target
-        when :front
-          cube.flip_up
-        when :right
-          cube.rotate
-          cube.flip_up
-        when :back
-          cube.rotate
-          cube.rotate
-          cube.flip_up
-        when :left
-          cube.rotate
-          cube.rotate
-          cube.rotate
-          cube.flip_up
-        when :bottom
-          cube.flip_up
-          cube.flip_up
-        when :top
-      end
-
-      # the top has no orientation; try the sides?
-      #if @multiplier == 1 || (rotation1 = self.class.rotate_face(cube.faces[:top])) == cube.faces[:top]
-      cube
-    end.flatten
-    @canonicals = canonicals.map(&:canonical)
+    orientations = [
+      self,
+      dup.flip_up.flip_up,
+      dup.flip_up,
+      dup.rotate.flip_up,
+      dup.rotate.rotate.flip_up,
+      dup.rotate.rotate.rotate.flip_up
+    ]
+    @canonical = orientations.map do |cube|
+      [
+        cube.linearize,
+        cube.dup.rotate.linearize,
+        cube.dup.rotate.rotate.linearize,
+        cube.dup.rotate.rotate.rotate.linearize
+      ]
+    end.flatten.sort.first
   end
 
   def extract_face(lines, x, y)
@@ -172,10 +155,6 @@ class Cube
 
   def rotate_face(face, direction)
     return nil unless face
-    if direction == :confused
-      sleep 5
-      exit 1
-    end
     self.class.send("rotate_face_#{direction}", face)
   end
 
@@ -204,36 +183,6 @@ class Cube
     new_face
   end
 
-  def self.flip_face(face)
-    width = face.map(&:length).max
-    height = face.length
-    new_face = Array.new(height)
-    new_face.map! { String.new.ljust(width) }
-    (0...height).each do |j|
-      (0...width).each do |i|
-        new_face[j][i] = face[-j - 1][i]
-      end
-    end
-    new_face
-  end
-
-  def self.mirror_face(face)
-    width = face.map(&:length).max
-    height = face.length
-    new_face = Array.new(height)
-    new_face.map! { String.new.ljust(width) }
-    (0...height).each do |j|
-      (0...width).each do |i|
-        new_face[j][i] = face[j][-i - 1]
-      end
-    end
-    new_face
-  end
-
-  def self.score_face(face)
-    face.join('').codepoints.inject(:+)
-  end
-
   def rotate
     @faces =
       {
@@ -244,6 +193,7 @@ class Cube
         left: @faces[:front],
         bottom: self.class.rotate_face_counterclockwise(@faces[:bottom])
       }
+    self
   end
 
   def flip_up
@@ -254,11 +204,12 @@ class Cube
         bottom: self.class.rotate_face_half(@faces[:back]),
         back: self.class.rotate_face_half(@faces[:top]),
         right: self.class.rotate_face_clockwise(@faces[:right]),
-        left: self.class.rotate_face_clockwise(@faces[:left])
+        left: self.class.rotate_face_counterclockwise(@faces[:left])
       }
+    self
   end
 
-  def canonical
+  def linearize
     @faces[:top].join('') + @faces[:front].join('') +
       @faces[:right].join('') + @faces[:back].join('') +
       @faces[:left].join('') + @faces[:bottom].join('')
@@ -268,19 +219,24 @@ end
 known_cubes = Set.new
 
 file = $stdin
-#file = File.open('example2')
+#file = File.open('example1')
 lines = []
+first = true
 while true
   line = file.gets
   if !line || line.strip.empty?
     break if lines.empty?
     cube = Cube.new(lines)
-    lines = []
-    canonicals = cube.canonicals
-    next if canonicals.any? {|c| known_cubes.include?(c) }
-    known_cubes.merge(canonicals)
+    canonical = cube.canonical
+    if known_cubes.include?(canonical)
+      lines = []
+      next
+    end
+    known_cubes << canonical
+    puts '' unless first
+    first = false
     puts lines
-    puts ''
+    lines = []
   else
     line = line[0...-1]
     lines << line
