@@ -1,75 +1,118 @@
 #!/usr/bin/env ruby
 
-require 'byebug'
+#require 'byebug'
 require 'set'
 
 class Cube
   attr_reader :canonicals, :faces
 
-  def initialize(lines)
-    width, height, multiplier = self.class.infer_multiplier(lines)
-    net = lines.map { |l| l.ljust(width * multiplier) }
+  def initialize(net)
+    @width, @height, @multiplier = self.class.infer_multiplier(net)
 
-    #debugger
-    mask = self.class.make_mask(net)
-    op = nil
-    index = nil
-    NET_MASKS.each do |operation, masks|
-      index = masks.index(mask)
-      op = operation
-      break if index
-    end
+    x = (@width - 1) / 2
+    y = (@height  - 1) / 2
 
-    debugger unless index
-    net_layout = NETS[index]
-    # transform the layout to match our net
-    case op
-      when :clockwise
-        net_layout = self.class.rotate_face_clockwise(net_layout)
-      when :half
-        net_layout = self.class.rotate_face_half(net_layout)
-      when :counterclockwise
-        net_layout = self.class.rotate_face_counterclockwise(net_layout)
-      when :flipped
-        mirrored = true
-        net_layout = self.class.flip_face(net_layout)
-      when :mirrored
-        mirrored = true
-        net_layout = self.class.mirror_face(net_layout)
-      when :clockwise_and_mirrored
-        mirrored = true
-        net_layout = self.class.rotate_face_clockwise(net_layout)
-        net_layout = self.class.mirror_face(net_layout)
-      when :plain
-    end
-
+   # debugger
     @faces = {}
-    (0...height).each do |j|
-      (0...width).each do |i|
-        if (name = FACE_NAME_MAP[net_layout[j][i]])
-          @faces[name] = net.slice(j * multiplier, multiplier).map { |row| row.slice(i * multiplier, multiplier) }
-        end
+    @faces[:top] = extract_face(net, x, y)
+    # given top as center (B = Back, b = Bottom, X = bottom OR another, depending on how you got there):
+    # rotate faces so that top's top is towards back, sides' top towards top, bottom's top towards front
+    #
+    #  XbX
+    # FLBRF
+    #   T
+    # BLFRB
+    #  XbX
+    #
+    #  OR
+    #
+    #  b b
+    # XB BX
+    # bLTRb
+    # XF FX
+    #  b b
+    @faces[:back] = back1 = rotate_face(extract_face(net, x, y - 1), :half) # checked
+    @faces[:front] = front1 = extract_face(net, x, y + 1) # checked
+    @faces[:left] = left1 = rotate_face(extract_face(net, x - 1, y), :counterclockwise) # checked
+    @faces[:right] = right1 = rotate_face(extract_face(net, x + 1, y), :clockwise) # checked
+    if back1
+      @faces[:bottom] ||= bottom2 = extract_face(net, x, y - 2) # checked
+      @faces[:left] ||= left2 = rotate_face(extract_face(net, x - 1, y - 1), :half) # checked
+      @faces[:right] ||= right2 = rotate_face(extract_face(net, x + 1, y - 1), :half) # checked
+      if bottom2
+        @faces[:left] ||= rotate_face(extract_face(net, x - 1, y - 2), :clockwise) # checked
+        @faces[:right] ||= rotate_face(extract_face(net, x + 1, y - 2), :counterclockwise) # checked
+      end
+      if left2
+        @faces[:bottom] ||= rotate_face(extract_face(net, x - 1, y - 2), :clockwise) # checked
+        @faces[:front] ||= rotate_face(extract_face(net, x - 2, y - 1), :half) # checked
+      end
+      if right2
+        @faces[:bottom] ||= rotate_face(extract_face(net, x + 1, y - 2), :counterclockwise) # checked
+        @faces[:front] ||= rotate_face(extract_face(net, x + 2, y - 1), :half) # checked
+      end
+    end
+    if front1
+      @faces[:bottom] ||= bottom3 = extract_face(net, x, y + 2) # checked
+      @faces[:left] ||= left3 = extract_face(net, x - 1, y + 1) # checked
+      @faces[:right] ||= right3 = extract_face(net, x + 1, y + 1) # checked
+      if bottom3
+        @faces[:left] ||= rotate_face(extract_face(net, x - 1, y + 2), :clockwise) # checked
+        @faces[:right] ||= rotate_face(extract_face(net, x + 1, y + 2), :counterclockwise) # checked
+      end
+      if left3
+        @faces[:back] ||= extract_face(net, x - 2, y + 1) # checked
+        @faces[:bottom] ||= rotate_face(extract_face(net, x - 1, y + 2), :counterclockwise) # checked
+      end
+      if right3
+        @faces[:back] ||= rotate_face(extract_face(net, x + 2, y + 1), :confused)
+        @faces[:bottom] ||= rotate_face(extract_face(net, x + 1, y + 2), :confused)
+      end
+    end
+    #  R L
+    # XB BX
+    # bLTRbL
+    # XF FX
+    #  R L
+    if left1
+      @faces[:bottom] ||= bottom4 = rotate_face(extract_face(net, x - 2, y), :half) # checked
+      @faces[:back] ||= back4 = rotate_face(extract_face(net, x - 1, y - 1), :counterclockwise) # checked
+      @faces[:front] ||= front4 = rotate_face(extract_face(net, x - 1, y + 1), :counterclockwise) # checked
+      if bottom4
+        @faces[:back] ||= rotate_face(extract_face(net, x - 2, y - 1), :confused)
+        @faces[:front] ||= rotate_face(extract_face(net, x - 2, y + 1), :confused)
+      end
+      if back4
+        @faces[:right] ||= rotate_face(extract_face(net, x - 1, y - 2), :confused)
+        @faces[:bottom] ||= rotate_face(extract_face(net, x - 2, y - 1), :confused)
+      end
+      if front4
+        @faces[:right] ||= rotate_face(extract_face(net, x - 2, y + 2), :confused)
+        @faces[:bottom] ||= rotate_face(extract_face(net, x - 2, y + 1), :confused)
+      end
+    end
+    if right1
+      @faces[:bottom] ||= bottom5 = rotate_face(extract_face(net, x + 2, y), :half) # checked
+      @faces[:back] ||= back5 = rotate_face(extract_face(net, x + 1, y - 1), :clockwise) # checked
+      @faces[:front] ||= front5 = rotate_face(extract_face(net, x + 1, y + 1), :clockwise) # checked
+      if bottom5
+        @faces[:back] ||= rotate_face(extract_face(net, x + 2, y - 1), :confused)
+        @faces[:front] ||= rotate_face(extract_face(net, x + 2, y + 1), :confused)
+      end
+      if back5
+        @faces[:left] ||= rotate_face(extract_face(net, x + 2, y - 2), :confused)
+        @faces[:bottom] ||= rotate_face(extract_face(net, x + 2, y - 1), :counterclockwise) # checked
+      end
+      if front5
+        @faces[:left] ||= rotate_face(extract_face(net, x + 1, y + 2), :confused)
+        @faces[:bottom] ||= rotate_face(extract_face(net, x + 2, y + 1), :confused)
       end
     end
 
-    # rotate faces appropriately
-    NET_ROTATIONS[index].each do |face, how|
-      if mirrored
-        if how == :counterclockwise
-          how = :clockwise
-        elsif how == :clockwise
-          how = :counterclockwise
-        end
-      end
-      @faces[face] = self.class.send("rotate_face_#{how}", @faces[face])
-    end
-
-    debugger
     scores = @faces.map { |name, face| [name, self.class.score_face(face)] }.sort_by(&:last)
 
     target_tops = scores.select { |(_name, score)| score == scores.first.last}.map(&:first)
 
-    canonicals = []
     canonicals = target_tops.map do |target|
       cube = dup
       case target
@@ -94,99 +137,20 @@ class Cube
       end
 
       # the top has no orientation; try the sides?
-      if multiplier == 1 || (rotation1 = self.class.rotate_face(cube.faces[:top])) == cube.faces[:top]
-
-      else
-
-      end
+      #if @multiplier == 1 || (rotation1 = self.class.rotate_face(cube.faces[:top])) == cube.faces[:top]
       cube
     end.flatten
-    #debugger
     @canonicals = canonicals.map(&:canonical)
   end
 
-  FACE_NAME_MAP =
-  {
-      'T' => :top,
-      'L' => :left,
-      'F' => :front,
-      'R' => :right,
-      'b' => :bottom,
-      'B' => :back
-  }.freeze
-
-  NETS = [
-   ['LTR',
-    ' F ',
-    ' b ',
-    ' B '],
-
-   [' TR',
-    'LF ',
-    ' b ',
-    ' B '],
-
-   [' TR',
-    ' F ',
-    'Lb ',
-    ' B '],
-
-   [' TR',
-    ' F ',
-    ' b ',
-    'LB '],
-
-   [' T ',
-    ' FR',
-    'Lb ',
-    ' B '],
-
-   [' T ',
-    'LFR',
-    ' b ',
-    ' B '],
-
-   ['  B',
-    'LTR',
-    ' F ',
-    ' b '],
-
-   ['  B',
-    ' TR',
-    'LF ',
-    ' b '],
-
-   [' BR',
-    ' T ',
-    'LF ',
-    'b  '],
-
-   ['  B',
-    ' TR',
-    'LF ',
-    'b  '
-   ],
-
-   [' L',
-    ' B',
-    'TR',
-    'F ',
-    'b ']
-  ].freeze
-
-  NET_ROTATIONS = [
-      { left: :counterclockwise, right: :clockwise, back: :half },
-      { right: :clockwise, back: :half },
-      { right: :clockwise, left: :clockwise, back: :half },
-      { right: :clockwise, left: :half, back: :half },
-      { left: :clockwise, back: :half },
-      { left: :counterclockwise, right: :clockwise, back: :half },
-      { back: :counterclockwise },
-      { right: :clockwise, back: :counterclockwise },
-      { back: :half, left: :clockwise, right: :clockwise, bottom: :counterclockwise },
-      { right: :clockwise, back: :clockwise, bottom: :counterclockwise },
-      { right: :clockwise, back: :counterclockwise, left: :half, bottom: :half }
-  ].freeze
+  def extract_face(lines, x, y)
+    return nil if x < 0 || y < 0 || x >= @width || y >= @height
+    return nil if lines[y * @multiplier][x * @multiplier] == ' ' ||
+        lines[y * @multiplier][x * @multiplier].nil?
+    lines.slice(y * @multiplier, @multiplier).map do |row|
+      row.slice(x * @multiplier, @multiplier)
+    end
+  end
 
   def self.infer_multiplier(net)
     width = net.map(&:length).max
@@ -206,23 +170,13 @@ class Cube
     [width, height, multiplier]
   end
 
-  def self.make_mask(net)
-    width, height, multiplier = infer_multiplier(net)
-    if multiplier > 1
-      new_net = []
-      (0...height).each do |y|
-        new_row = ''
-        (0...width).each do |x|
-          new_row << net[y * multiplier][x * multiplier]
-        end
-        new_net << new_row
-      end
-      net = new_net
+  def rotate_face(face, direction)
+    return nil unless face
+    if direction == :confused
+      sleep 5
+      exit 1
     end
-
-    net.map do |line|
-      line.ljust(width).gsub(/\S/, 'X')
-    end
+    self.class.send("rotate_face_#{direction}", face)
   end
 
   def self.rotate_face_clockwise(face)
@@ -280,19 +234,6 @@ class Cube
     face.join('').codepoints.inject(:+)
   end
 
-  net_masks = NETS.map do |net|
-    make_mask(net).freeze
-  end
-  NET_MASKS = {
-    plain: net_masks.freeze,
-    clockwise: net_masks.map { |net| rotate_face_clockwise(net).freeze }.freeze,
-    half: net_masks.map { |net| rotate_face_half(net).freeze }.freeze,
-    counterclockwise: net_masks.map { |net| rotate_face_counterclockwise(net).freeze }.freeze,
-    flipped: net_masks.map { |net| flip_face(net).freeze }.freeze,
-    mirrored: net_masks.map { |net| mirror_face(net).freeze }.freeze,
-    clockwise_and_mirrored: net_masks.map { |net| mirror_face(rotate_face_clockwise(net)) }
-  }.freeze
-
   def rotate
     @faces =
       {
@@ -327,7 +268,7 @@ end
 known_cubes = Set.new
 
 file = $stdin
-file = File.open('example1')
+#file = File.open('example2')
 lines = []
 while true
   line = file.gets
