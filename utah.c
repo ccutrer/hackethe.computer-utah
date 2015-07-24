@@ -4,7 +4,7 @@
 
 int find_move_axis(char ***cube, char team, char axis)
 {
-  int i, j, k, w;
+  int i, j, k, w, count, middle_count;
   int *x, *y, *z;
   if (axis == 'X') {
     x = &i;
@@ -38,7 +38,36 @@ int find_move_axis(char ***cube, char team, char axis)
   // check axis 1 for columns that have 4 of our team
   for (i = 0; i < 3; ++i) {
     for (w = 0; w < 2; ++w) {
-      if (columns[i][w] + columns[i][w + 1] >= 4) {
+      if ( (count = columns[i][w] + columns[i][w + 1]) >= 4) {
+        middle_count = 0;
+        j = w + 1;
+        // a move in the middle is only a winner if you own the one next to it
+        // (otherwise you're creating C)
+        k = 1;
+        if (cube[*x][*y][*z] == team) {
+          ++middle_count;
+          j = w;
+          if (cube[*x][*y][*z] == '_') {
+            cube[*x][*y][*z] = 'X';
+            result = 1;
+            goto done;
+          }
+        }
+        j = w;
+        if (cube[*x][*y][*z] == team) {
+          ++middle_count;
+          j = w + 1;
+          if (cube[*x][*y][*z] == '_') {
+            cube[*x][*y][*z] = 'X';
+            result = 1;
+            goto done;
+          }
+        }
+        // if you only have 4, and none in the middle,
+        // you can't complete it
+        if (count == 4 && middle_count != 2) {
+          continue;
+        }
         // any available corner move is a winner;
         // check all 4
         j = w;
@@ -66,26 +95,6 @@ int find_move_axis(char ***cube, char team, char axis)
           result = 1;
           goto done;
         }
-        // a move in the middle is only a winner if you own the one next to it
-        // (otherwise you're creating C)
-        k = 1;
-        if (cube[*x][*y][*z] == team) {
-          j = w;
-          if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = 'X';
-            result = 1;
-            goto done;
-          }
-        }
-        j = w;
-        if (cube[*x][*y][*z] == team) {
-          j = w + 1;
-          if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = 'X';
-            result = 1;
-            goto done;
-          }
-        }
       }
     }
   }
@@ -93,7 +102,35 @@ int find_move_axis(char ***cube, char team, char axis)
   // and now axis 2
     for (w = 0; w < 2; ++w) {
       for (j = 0; j < 2; ++j) {
-        if (columns[w][j] + columns[w + 1][j] >= 4) {
+        if ( (count = columns[w][j] + columns[w + 1][j]) >= 4) {
+          // middles
+          middle_count = 0;
+            k = 1;
+            i = w + 1;
+            if (cube[*x][*y][*z] == team) {
+              ++middle_count;
+              i = w;
+              if (cube[*x][*y][*z] == '_') {
+                cube[*x][*y][*z] = 'X';
+                result = 1;
+                goto done;
+              }
+            }
+            i = w;
+            if (cube[*x][*y][*z] == team) {
+              ++middle_count;
+              i = w + 1;
+              if (cube[*x][*y][*z] == '_') {
+                cube[*x][*y][*z] = 'X';
+                result = 1;
+                goto done;
+              }
+            }
+            if (count == 4 && middle_count != 2) {
+              continue;
+            }
+
+            // corners
           i = w;
           k = 0;
           if (cube[*x][*y][*z] == '_') {
@@ -118,24 +155,6 @@ int find_move_axis(char ***cube, char team, char axis)
             cube[*x][*y][*z] = 'X';
             result = 1;
             goto done;
-          }
-          k = 1;
-          if (cube[*x][*y][*z] == team) {
-            i = w;
-            if (cube[*x][*y][*z] == '_') {
-              cube[*x][*y][*z] = 'X';
-              result = 1;
-              goto done;
-            }
-          }
-          i = w;
-          if (cube[*x][*y][*z] == team) {
-            i = w + 1;
-            if (cube[*x][*y][*z] == '_') {
-              cube[*x][*y][*z] = 'X';
-              result = 1;
-              goto done;
-            }
           }
         }
       }
