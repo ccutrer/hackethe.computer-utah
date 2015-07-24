@@ -182,7 +182,7 @@ int main(int argc, char **argv)
     }
 
     FILE *file = stdin;
-    file = fopen("example1", "r");
+    //file = fopen("example1", "r");
 
     first_cube = 1;
     while(!feof(file)) {
