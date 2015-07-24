@@ -111,7 +111,7 @@ int find_move(char ***cube, int size, char team, char my_team)
   return 0;
 }
 
-static const int MAX_SIZE = 2000;
+static const int MAX_SIZE = 500;
 
 int main(int argc, char **argv)
 {
@@ -157,7 +157,7 @@ int main(int argc, char **argv)
 
       // If we can't find a winning move for X,
       // find a winning move for O and block it
-      if (!find_move(cube, size, 'X', 'X')) {
+      if (0 && !find_move(cube, size, 'X', 'X')) {
         if (!find_move(cube, size, 'O', 'X')) {
           //sleep(2);
         }
