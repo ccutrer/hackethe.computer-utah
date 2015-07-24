@@ -90,9 +90,9 @@ int find_move_axis(char ***cube, int size, char team, char my_team, char axis)
 
   for (i = 0; i <= size - 3; ++i) {
     for (j = 0; j <= size - 2; ++j) {
-      if (find_utah(cube, size, i, j, team, my_team, axis, 0))
+      if (find_utah(cube, size, i, j, team, my_team, axis, 1))
         return 1;
-      if (find_utah(cube, size, j, i, team, my_team, axis, 1))
+      if (find_utah(cube, size, j, i, team, my_team, axis, 0))
         return 1;
     }
   }
@@ -136,11 +136,6 @@ int main(int argc, char **argv)
         for (j = 0; j < size; ++j) {
           for (k = 0; k < size; ++k) {
             char next = fgetc(file);
-            // well crap, we're not big enough
-            if (k == MAX_SIZE - 1) {
-              sleep(5);
-              return 1;
-            }
             if (next == ' ') {
               size = k;
               break;
@@ -157,7 +152,7 @@ int main(int argc, char **argv)
 
       // If we can't find a winning move for X,
       // find a winning move for O and block it
-      if (0 && !find_move(cube, size, 'X', 'X')) {
+      if (!find_move(cube, size, 'X', 'X')) {
         if (!find_move(cube, size, 'O', 'X')) {
           //sleep(2);
         }
