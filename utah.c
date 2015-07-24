@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int find_move_axis(char ***cube, char team, char axis)
+int find_move_axis(char ***cube, char team, char my_team, char axis)
 {
   int i, j, k, w, count, middle_count;
   int *x, *y, *z;
@@ -49,7 +49,7 @@ int find_move_axis(char ***cube, char team, char axis)
           ++middle_count;
           j = w;
           if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = 'X';
+            cube[*x][*y][*z] = my_team;
             result = 1;
             goto done;
           }
@@ -59,7 +59,7 @@ int find_move_axis(char ***cube, char team, char axis)
           ++middle_count;
           j = w + 1;
           if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = 'X';
+            cube[*x][*y][*z] = my_team;
             result = 1;
             goto done;
           }
@@ -74,25 +74,25 @@ int find_move_axis(char ***cube, char team, char axis)
         j = w;
         k = 0;
         if (cube[*x][*y][*z] == '_') {
-          cube[*x][*y][*z] = 'X';
+          cube[*x][*y][*z] = my_team;
           result = 1;
           goto done;
         }
         k = 2;
         if (cube[*x][*y][*z] == '_') {
-          cube[*x][*y][*z] = 'X';
+          cube[*x][*y][*z] = my_team;
           result = 1;
           goto done;
         }
         j = w + 1;
         if (cube[*x][*y][*z] == '_') {
-          cube[*x][*y][*z] = 'X';
+          cube[*x][*y][*z] = my_team;
           result = 1;
           goto done;
         }
         k = 0;
         if (cube[*x][*y][*z] == '_') {
-          cube[*x][*y][*z] = 'X';
+          cube[*x][*y][*z] = my_team;
           result = 1;
           goto done;
         }
@@ -112,7 +112,7 @@ int find_move_axis(char ***cube, char team, char axis)
               ++middle_count;
               i = w;
               if (cube[*x][*y][*z] == '_') {
-                cube[*x][*y][*z] = 'X';
+                cube[*x][*y][*z] = my_team;
                 result = 1;
                 goto done;
               }
@@ -122,7 +122,7 @@ int find_move_axis(char ***cube, char team, char axis)
               ++middle_count;
               i = w + 1;
               if (cube[*x][*y][*z] == '_') {
-                cube[*x][*y][*z] = 'X';
+                cube[*x][*y][*z] = my_team;
                 result = 1;
                 goto done;
               }
@@ -135,25 +135,25 @@ int find_move_axis(char ***cube, char team, char axis)
           i = w;
           k = 0;
           if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = 'X';
+            cube[*x][*y][*z] = my_team;
             result = 1;
             goto done;
           }
           k = 2;
           if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = 'X';
+            cube[*x][*y][*z] = my_team;
             result = 1;
             goto done;
           }
           i = w + 1;
           if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = 'X';
+            cube[*x][*y][*z] = my_team;
             result = 1;
             goto done;
           }
           k = 0;
           if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = 'X';
+            cube[*x][*y][*z] = my_team;
             result = 1;
             goto done;
           }
@@ -169,15 +169,15 @@ done:
   return result;
 }
 
-int find_move(char ***cube, char team)
+int find_move(char ***cube, char team, char my_team)
 {
-  int result = find_move_axis(cube, team, 'X');
+  int result = find_move_axis(cube, team, my_team, 'X');
   if (result)
     return result;
-  result = find_move_axis(cube, team, 'Y');
+  result = find_move_axis(cube, team, my_team, 'Y');
   if (result)
     return result;
-  result = find_move_axis(cube, team, 'Z');
+  result = find_move_axis(cube, team, my_team, 'Z');
   return result;
 }
 
@@ -213,8 +213,8 @@ int main(int argc, char **argv)
 
       // If we can't find a winning move for X,
       // find a winning move for O and block it
-      if (!find_move(cube, 'X')) {
-        if (!find_move(cube, 'O')) {
+      if (!find_move(cube, 'X', 'X')) {
+        if (!find_move(cube, 'O', 'X')) {
           sleep(2);
         }
       }
