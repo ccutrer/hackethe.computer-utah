@@ -40,10 +40,7 @@ int find_move_axis(char ***cube, char team, char axis)
     for (w = 0; w < 2; ++w) {
       if (columns[i][w] + columns[i][w + 1] >= 4) {
         // any available corner move is a winner;
-        // check all 4:
-        // XX
-        // __
-        // XX
+        // check all 4
         j = w;
         k = 0;
         if (cube[*x][*y][*z] == '_') {
@@ -70,18 +67,19 @@ int find_move_axis(char ***cube, char team, char axis)
           goto done;
         }
         // a move in the middle is only a winner if you own the one next to it
+        // (otherwise you're creating C)
         k = 1;
         if (cube[*x][*y][*z] == team) {
-          k = 0;
+          j = w;
           if (cube[*x][*y][*z] == '_') {
             cube[*x][*y][*z] = 'X';
             result = 1;
             goto done;
           }
         }
-        k = 0;
+        j = w;
         if (cube[*x][*y][*z] == team) {
-          j = w;
+          j = w + 1;
           if (cube[*x][*y][*z] == '_') {
             cube[*x][*y][*z] = 'X';
             result = 1;
@@ -96,11 +94,6 @@ int find_move_axis(char ***cube, char team, char axis)
     for (w = 0; w < 2; ++w) {
       for (j = 0; j < 2; ++j) {
         if (columns[w][j] + columns[w + 1][j] >= 4) {
-          // any available corner move is a winner;
-          // check all 4:
-          // XX
-          // __
-          // XX
           i = w;
           k = 0;
           if (cube[*x][*y][*z] == '_') {
@@ -126,7 +119,6 @@ int find_move_axis(char ***cube, char team, char axis)
             result = 1;
             goto done;
           }
-          // a move in the middle is only a winner if you own the one next to it
           k = 1;
           if (cube[*x][*y][*z] == team) {
             i = w;
@@ -136,9 +128,9 @@ int find_move_axis(char ***cube, char team, char axis)
               goto done;
             }
           }
-          k = 0;
+          i = w;
           if (cube[*x][*y][*z] == team) {
-            k = 1;
+            i = w + 1;
             if (cube[*x][*y][*z] == '_') {
               cube[*x][*y][*z] = 'X';
               result = 1;
@@ -182,7 +174,8 @@ int main(int argc, char **argv)
     }
 
     FILE *file = stdin;
-    //file = fopen("example1", "r");
+    if (argc == 2)
+      file = fopen(argv[1], "r");
 
     first_cube = 1;
     while(!feof(file)) {
@@ -218,6 +211,13 @@ int main(int argc, char **argv)
         }
       }
       putc('\n', stdout);
+    }
+
+    for (i = 0; i < 3; ++i) {
+      for (j = 0; j < 3; j++) {
+        free(cube[i][j]);
+      }
+      free(cube[i]);
     }
 
     return 0;
