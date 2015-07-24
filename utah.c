@@ -210,7 +210,6 @@ int main(int argc, char **argv)
       }
       // blank newline
       fgetc(file);
-      sleep(2);
 
       // If we can't find a winning move for X,
       // find a winning move for O and block it
@@ -240,6 +239,8 @@ int main(int argc, char **argv)
       }
       free(cube[i]);
     }
+
+      sleep(2);
 
     return 0;
 }
