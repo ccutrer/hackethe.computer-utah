@@ -213,8 +213,11 @@ int main(int argc, char **argv)
 
       // If we can't find a winning move for X,
       // find a winning move for O and block it
-      if (!find_move(cube, 'X'))
-        find_move(cube, 'O');
+      if (!find_move(cube, 'X')) {
+        if (!find_move(cube, 'O')) {
+          sleep(2);
+        }
+      }
 
       if (!first_cube)
         putc('\n', stdout);
