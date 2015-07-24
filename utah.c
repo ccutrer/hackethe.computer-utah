@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int find_move_axis(char ***cube, char team, char my_team, char axis)
+int find_utah(char ***cube, int size, int i1, int j1, char team, char my_team, char axis, int horizontal)
 {
   int i, j, k, w, count, middle_count;
   int *x, *y, *z;
@@ -21,175 +21,107 @@ int find_move_axis(char ***cube, char team, char my_team, char axis)
     z = &j;
   }
 
-  // compute the number for our team for each column (9 of them)
-  int *columns[3];
-
-  for (i = 0; i < 3; ++i) {
-    columns[i] = (int *)malloc(sizeof(int) * 3);
-    for (j = 0; j < 3; ++j) {
-      columns[i][j] = 0;
-      for (k = 0; k < 3; ++k) {
-        columns[i][j] += (cube[*x][*y][*z] == team ? 1 : 0);
-      }
-    }
+  if (horizontal)
+  {
+    int *temp = x;
+    x = y;
+    y = temp;
   }
 
-  int result = 0;
-
-  // check axis 1 for columns that have 4 of our team
-  for (i = 0; i < 3; ++i) {
-    for (w = 0; w < 2; ++w) {
-      if ( (count = columns[i][w] + columns[i][w + 1]) >= 4) {
-        middle_count = 0;
-        j = w + 1;
-        // a move in the middle is only a winner if you own the one next to it
-        // (otherwise you're creating C)
-        k = 1;
+  for (k = 0; k < size; ++k) {
+    count = 0;
+    middle_count = 0;
+    for (i = i1; i < i1 + 3; ++i) {
+      for (j = j1; j < j1 + 2; ++j) {
         if (cube[*x][*y][*z] == team) {
-          ++middle_count;
-          j = w;
-          if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = my_team;
-            result = 1;
-            goto done;
-          }
-        }
-        j = w;
-        if (cube[*x][*y][*z] == team) {
-          ++middle_count;
-          j = w + 1;
-          if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = my_team;
-            result = 1;
-            goto done;
-          }
-        }
-        // if you only have 4, and none in the middle,
-        // you can't complete it
-        if (count == 4 && middle_count != 2) {
-          continue;
-        }
-        // any available corner move is a winner;
-        // check all 4
-        j = w;
-        k = 0;
-        if (cube[*x][*y][*z] == '_') {
-          cube[*x][*y][*z] = my_team;
-          result = 1;
-          goto done;
-        }
-        k = 2;
-        if (cube[*x][*y][*z] == '_') {
-          cube[*x][*y][*z] = my_team;
-          result = 1;
-          goto done;
-        }
-        j = w + 1;
-        if (cube[*x][*y][*z] == '_') {
-          cube[*x][*y][*z] = my_team;
-          result = 1;
-          goto done;
-        }
-        k = 0;
-        if (cube[*x][*y][*z] == '_') {
-          cube[*x][*y][*z] = my_team;
-          result = 1;
-          goto done;
-        }
-      }
-    }
-  }
-
-  // and now axis 2
-    for (w = 0; w < 2; ++w) {
-      for (j = 0; j < 3; ++j) {
-        if ( (count = columns[w][j] + columns[w + 1][j]) >= 4) {
-          // middles
-          middle_count = 0;
-            k = 1;
-            i = w + 1;
-            if (cube[*x][*y][*z] == team) {
-              ++middle_count;
-              i = w;
-              if (cube[*x][*y][*z] == '_') {
-                cube[*x][*y][*z] = my_team;
-                result = 1;
-                goto done;
-              }
-            }
-            i = w;
-            if (cube[*x][*y][*z] == team) {
-              ++middle_count;
-              i = w + 1;
-              if (cube[*x][*y][*z] == '_') {
-                cube[*x][*y][*z] = my_team;
-                result = 1;
-                goto done;
-              }
-            }
-            if (count == 4 && middle_count != 2) {
-              continue;
-            }
-
-            // corners
-          i = w;
-          k = 0;
-          if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = my_team;
-            result = 1;
-            goto done;
-          }
-          k = 2;
-          if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = my_team;
-            result = 1;
-            goto done;
-          }
-          i = w + 1;
-          if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = my_team;
-            result = 1;
-            goto done;
-          }
-          k = 0;
-          if (cube[*x][*y][*z] == '_') {
-            cube[*x][*y][*z] = my_team;
-            result = 1;
-            goto done;
-          }
+          ++count;
+          if (j - j1 == 1)
+           ++middle_count;
         }
       }
     }
 
-done:
-
-  for (i = 0; i < 3; ++i) {
-    free(columns[i]);
+    if (count == 5 || (count == 4 && middle_count != 0)) {
+      // find the available space
+      // check the middle first
+      j = j1 + 1;
+      i = i1;
+      if (cube[*x][*y][*z] == '_') {
+        cube[*x][*y][*z] = my_team;
+        return 1;
+      }
+      ++i;
+      if (cube[*x][*y][*z] == '_') {
+        cube[*x][*y][*z] = my_team;
+        return 1;
+      }
+      // now the corners
+      j = j1;
+      i = i1;
+      if (cube[*x][*y][*z] == '_') {
+        cube[*x][*y][*z] = my_team;
+        return 1;
+      }
+      ++i;
+      if (cube[*x][*y][*z] == '_') {
+        cube[*x][*y][*z] = my_team;
+        return 1;
+      }
+      j = j1 + 2;
+      i = i1;
+      if (cube[*x][*y][*z] == '_') {
+        cube[*x][*y][*z] = my_team;
+        return 1;
+      }
+      ++i;
+      if (cube[*x][*y][*z] == '_') {
+        cube[*x][*y][*z] = my_team;
+        return 1;
+      }
+    }
   }
-  return result;
+
+  return 0;
 }
 
-int find_move(char ***cube, char team, char my_team)
+int find_move_axis(char ***cube, int size, char team, char my_team, char axis)
 {
-  int result = find_move_axis(cube, team, my_team, 'X');
-  if (result)
-    return result;
-  result = find_move_axis(cube, team, my_team, 'Y');
-  if (result)
-    return result;
-  result = find_move_axis(cube, team, my_team, 'Z');
-  return result;
+  int i, j;
+
+  for (i = 0; i <= size - 3; ++i) {
+    for (j = 0; j <= size - 2; ++j) {
+      if (find_utah(cube, size, i, j, team, my_team, axis, 0))
+        return 1;
+      if (find_utah(cube, size, j, i, team, my_team, axis, 1))
+        return 1;
+    }
+  }
+
+  return 0;
 }
+
+int find_move(char ***cube, int size, char team, char my_team)
+{
+  if (find_move_axis(cube, size, team, my_team, 'X'))
+    return 1;
+  if (find_move_axis(cube, size, team, my_team, 'Y'))
+    return 1;
+  if (find_move_axis(cube, size, team, my_team, 'Z'))
+    return 1;
+  return 0;
+}
+
+static const int MAX_SIZE = 50;
 
 int main(int argc, char **argv)
 {
-    char **cube[3];
+    char **cube[MAX_SIZE];
     int i, j, k, first_cube;;
 
-    for (i = 0; i < 3; ++i) {
-      cube[i] = (char **)malloc(sizeof(char *) * 3);
-      for (j = 0; j < 3; j++) {
-        cube[i][j] = (char *)malloc(sizeof(char) * 3);
+    for (i = 0; i < MAX_SIZE; ++i) {
+      cube[i] = (char **)malloc(sizeof(char *) * MAX_SIZE);
+      for (j = 0; j < MAX_SIZE; j++) {
+        cube[i][j] = (char *)malloc(sizeof(char) * MAX_SIZE);
       }
     }
 
@@ -199,13 +131,25 @@ int main(int argc, char **argv)
 
     first_cube = 1;
     while(!feof(file)) {
-      for (i = 0; i < 3; ++i) {
-        for (j = 0; j < 3; ++j) {
-          for (k = 0; k < 3; ++k) {
-            cube[i][j][k] = fgetc(file);
+      int size = MAX_SIZE;
+      for (i = 0; i < size; ++i) {
+        for (j = 0; j < size; ++j) {
+          for (k = 0; k < size; ++k) {
+            char next = fgetc(file);
+            // well crap, we're not big enough
+            if (k == MAX_SIZE - 1) {
+              sleep(5);
+              return 1;
+            }
+            if (next == ' ') {
+              size = k;
+              break;
+            }
+            cube[i][j][k] = next;
           }
-          // space or newline
-          fgetc(file);
+          // space or newline; except when we detected it above
+          if (i != 0 || j != 0)
+            fgetc(file);
         }
       }
       // blank newline
@@ -213,22 +157,22 @@ int main(int argc, char **argv)
 
       // If we can't find a winning move for X,
       // find a winning move for O and block it
-      if (!find_move(cube, 'X', 'X')) {
-        if (!find_move(cube, 'O', 'X')) {
-          sleep(2);
+      if (!find_move(cube, size, 'X', 'X')) {
+        if (!find_move(cube, size, 'O', 'X')) {
+          //sleep(2);
         }
       }
 
       if (!first_cube)
         putc('\n', stdout);
       first_cube = 0;
-      for (i = 0; i < 3; ++i) {
+      for (i = 0; i < size; ++i) {
         if (i != 0)
           putc('\n', stdout);
-        for (j = 0; j < 3; ++j) {
+        for (j = 0; j < size; ++j) {
           if (j != 0)
             putc(' ', stdout);
-          for (k = 0; k < 3; ++k) {
+          for (k = 0; k < size; ++k) {
             putc(cube[i][j][k], stdout);
           }
         }
@@ -236,8 +180,8 @@ int main(int argc, char **argv)
       putc('\n', stdout);
     }
 
-    for (i = 0; i < 3; ++i) {
-      for (j = 0; j < 3; j++) {
+    for (i = 0; i < MAX_SIZE; ++i) {
+      for (j = 0; j < MAX_SIZE; j++) {
         free(cube[i][j]);
       }
       free(cube[i]);
