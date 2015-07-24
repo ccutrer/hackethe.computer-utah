@@ -101,7 +101,7 @@ int find_move_axis(char ***cube, char team, char axis)
 
   // and now axis 2
     for (w = 0; w < 2; ++w) {
-      for (j = 0; j < 2; ++j) {
+      for (j = 0; j < 3; ++j) {
         if ( (count = columns[w][j] + columns[w + 1][j]) >= 4) {
           // middles
           middle_count = 0;
