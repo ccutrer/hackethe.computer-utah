@@ -240,7 +240,5 @@ int main(int argc, char **argv)
       free(cube[i]);
     }
 
-      sleep(2);
-
     return 0;
 }
