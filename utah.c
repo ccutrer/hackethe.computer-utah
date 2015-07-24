@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <memory.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int find_move_axis(char ***cube, char team, char axis)
 {
@@ -209,6 +210,7 @@ int main(int argc, char **argv)
       }
       // blank newline
       fgetc(file);
+      sleep(2);
 
       // If we can't find a winning move for X,
       // find a winning move for O and block it
