@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+file = stdin
+file = File.open(ARGV[0]) if ARGV[0]
+
+cubes = file.readlines.split("\n")
+biggest = cubes.map(&:first).map(&:length).max / 3
+
+sleep 5 if biggest > 3
