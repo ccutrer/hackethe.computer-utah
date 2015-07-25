@@ -9,4 +9,4 @@ cubes = file.read.split("\n\n").map { |c| c.split("\n") }
 biggest = cubes.map(&:length).max
 
 puts biggest
-sleep 5 if biggest > 10
+sleep 5 if biggest > 15
