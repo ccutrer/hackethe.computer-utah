@@ -1,9 +1,12 @@
 #!/usr/bin/env ruby
 
-file = stdin
+#require 'byebug'
+
+file = $stdin
 file = File.open(ARGV[0]) if ARGV[0]
 
-cubes = file.readlines.split("\n")
-biggest = cubes.map(&:first).map(&:length).max / 3
+cubes = file.read.split("\n\n").map { |c| c.split("\n") }
+biggest = cubes.map(&:length).max
 
+puts biggest
 sleep 5 if biggest > 3
