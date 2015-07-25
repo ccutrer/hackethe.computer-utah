@@ -1,4 +1,4 @@
 all:
-	gcc utah.c -g -O3 -o run
+	true
 
 .PHONY: all
