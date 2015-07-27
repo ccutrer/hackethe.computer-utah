@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #define CHECK_X(i, j) \
-  if (i >= 0 && j >= 0 && cube[i][j][z] == cube[x][y][z]) { \
+  if (i >= 0 && j >= 0 && i < size && j < size && cube[i][j][z] == cube[x][y][z]) { \
     contiguous += 1; \
     if (max_contiguous < contiguous) \
       max_contiguous = contiguous; \
@@ -16,7 +16,7 @@
   }
 
 #define CHECK_Y(i, j) \
-  if (i >= 0 && j >= 0 && cube[x][i][j] == cube[x][y][z]) { \
+  if (i >= 0 && j >= 0 && i < size && j < size && cube[x][i][j] == cube[x][y][z]) { \
     contiguous += 1; \
     if (max_contiguous < contiguous) \
       max_contiguous = contiguous; \
@@ -28,7 +28,7 @@
   }
 
 #define CHECK_Z(i, j) \
-  if (i >= 0 && j >= 0 && cube[i][y][j] == cube[x][y][z]) { \
+  if (i >= 0 && j >= 0 && i < size && j < size && cube[i][y][j] == cube[x][y][z]) { \
     contiguous += 1; \
     if (max_contiguous < contiguous) \
       max_contiguous = contiguous; \
@@ -53,8 +53,8 @@ int check_from_frd(char ***cube, int size, int x, int y, int z)
   CHECK_X(x + 1, y);
   CHECK_X(x + 1, y + 1);
   CHECK_X(x, y + 1);
+  CHECK_X(x - 1, y + 1);
   CHECK_X(x - 1, y);
-  CHECK_X(x - 1, y - 1);
   if (count >= 4 && middles_count >= 3 && max_contiguous >= 3)
     return 1;
 
@@ -68,8 +68,8 @@ CHECK_Y(y + 1, z - 1);
 CHECK_Y(y + 1, z);
 CHECK_Y(y + 1, z + 1);
 CHECK_Y(y, z + 1);
+CHECK_Y(y - 1, z + 1);
 CHECK_Y(y - 1, z);
-CHECK_Y(y - 1, z - 1);
   if (count >= 4 && middles_count >= 3 && max_contiguous >= 3)
     return 1;
 
@@ -83,8 +83,8 @@ CHECK_Y(y - 1, z - 1);
   CHECK_Z(x + 1, z);
   CHECK_Z(x + 1, z + 1);
   CHECK_Z(x, z + 1);
+  CHECK_Z(x - 1, z + 1);
   CHECK_Z(x - 1, z);
-  CHECK_Z(x - 1, z - 1);
   if (count >= 4 && middles_count >= 3 && max_contiguous >= 3)
     return 1;
 
@@ -97,13 +97,13 @@ char check_from(char ***cube, int size, int x, int y, int z)
   int i, j, k;
   char found, best_found = 0;
   cube[x][y][z] = 'X';
-  for (i = x - 2; i <= x + 2 && i < size - 1; ++i) {
+  for (i = x - 2; i <= x + 2 && i < size; ++i) {
     if (i < 0)
       continue;
-    for (j = y - 2; j <= y + 2 && j < size - 1; ++j) {
+    for (j = y - 2; j <= y + 2 && j < size; ++j) {
       if (j < 0)
         continue;
-      for (k = z - 2; k <= z + 2 && k < size - 1; ++k) {
+      for (k = z - 2; k <= z + 2 && k < size; ++k) {
         if (k < 0)
           continue;
         if (cube[i][j][k] != 'X' && cube[i][j][k] != 'O')
