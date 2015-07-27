@@ -8,9 +8,6 @@
     contiguous += 1; \
     if (max_contiguous < contiguous) \
       max_contiguous = contiguous; \
-    count += 1; \
-    if (i == x || j == y) \
-      middles_count += 1; \
   } else { \
     contiguous = 0; \
   }
@@ -20,9 +17,6 @@
     contiguous += 1; \
     if (max_contiguous < contiguous) \
       max_contiguous = contiguous; \
-    count += 1; \
-    if (i == y || j == z) \
-      middles_count += 1; \
   } else { \
     contiguous = 0; \
   }
@@ -32,19 +26,14 @@
     contiguous += 1; \
     if (max_contiguous < contiguous) \
       max_contiguous = contiguous; \
-    count += 1; \
-    if (i == x || j == z) \
-      middles_count += 1; \
   } else { \
     contiguous = 0; \
   }
 
 int check_from_frd(char ***cube, int size, int x, int y, int z)
 {
-  int real_count, count, middles_count, real_middles_count, contiguous, max_contiguous;
+  int contiguous, max_contiguous;
 
-  count = 0;
-  middles_count = 0;
   contiguous = 0;
   max_contiguous = 0;
   CHECK_X(x - 1, y - 1);
@@ -55,15 +44,13 @@ int check_from_frd(char ***cube, int size, int x, int y, int z)
   CHECK_X(x, y + 1);
   CHECK_X(x - 1, y + 1);
   CHECK_X(x - 1, y);
-  real_count = count;
-  real_middles_count = middles_count;
+
   CHECK_X(x - 1, y - 1);
   CHECK_X(x, y - 1);
-  if (real_count >= 4 && real_middles_count >= 3 && max_contiguous >= 3)
+  CHECK_X(x + 1, y - 1);
+  if (max_contiguous >= 4)
     return 1;
 
-  count = 0;
-  middles_count = 0;
   contiguous = 0;
   max_contiguous = 0;
 CHECK_Y(y - 1, z - 1);
@@ -74,16 +61,13 @@ CHECK_Y(y + 1, z + 1);
 CHECK_Y(y, z + 1);
 CHECK_Y(y - 1, z + 1);
 CHECK_Y(y - 1, z);
-  real_count = count;
-    real_middles_count = middles_count;
 
   CHECK_Y(y - 1, z - 1);
 CHECK_Y(y, z - 1);
-  if (real_count >= 4 && real_middles_count >= 3 && max_contiguous >= 3)
+CHECK_Y(y + 1, z - 1);
+  if (max_contiguous >= 4)
     return 1;
 
-  count = 0;
-  middles_count = 0;
     contiguous = 0;
     max_contiguous = 0;
   CHECK_Z(x - 1, z - 1);
@@ -94,13 +78,12 @@ CHECK_Y(y, z - 1);
   CHECK_Z(x, z + 1);
   CHECK_Z(x - 1, z + 1);
   CHECK_Z(x - 1, z);
-    real_count = count;
-      real_middles_count = middles_count;
 
     CHECK_Z(x - 1, z - 1);
   CHECK_Z(x, z - 1);
+  CHECK_Z(x + 1, z - 1);
 
-  if (real_count >= 4 && real_middles_count >= 3 && max_contiguous >= 3)
+  if (max_contiguous >= 4)
     return 1;
 
   return 0;
@@ -112,13 +95,13 @@ char check_from(char ***cube, int size, int x, int y, int z)
   int i, j, k;
   char found, best_found = 0;
   cube[x][y][z] = 'X';
-  for (i = x - 2; i <= x + 2 && i < size; ++i) {
+  for (i = x - 1; i <= x + 1 && i < size; ++i) {
     if (i < 0)
       continue;
-    for (j = y - 2; j <= y + 2 && j < size; ++j) {
+    for (j = y - 1; j <= y + 1 && j < size; ++j) {
       if (j < 0)
         continue;
-      for (k = z - 2; k <= z + 2 && k < size; ++k) {
+      for (k = z - 1; k <= z + 1 && k < size; ++k) {
         if (k < 0)
           continue;
         if (cube[i][j][k] != 'X' && cube[i][j][k] != 'O')
