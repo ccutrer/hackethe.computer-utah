@@ -132,12 +132,12 @@ int find_move(char ***cube, int size)
     for (j = 0; j < size; ++j) {
       for (k = 0; k < size; ++k) {
         if (cube[i][j][k] == '_') {
-          if (i > 0 && cube[i - 1][j][k] != '_' ||
-              j > 0 && cube[i][j - 1][k] != '_' ||
-              k > 0 && cube[i][j][k - 1] != '_' ||
-              i < size - 1 && cube[i + 1][j][k] != '_' ||
-              j < size - 1 && cube[i][j + 1][k] != '_' ||
-              k < size - 1 && cube[i][j][k + 1] != '_') {
+          if ((i > 0 && cube[i - 1][j][k] != '_') ||
+              (j > 0 && cube[i][j - 1][k] != '_') ||
+              (k > 0 && cube[i][j][k - 1] != '_') ||
+              (i < size - 1 && cube[i + 1][j][k] != '_') ||
+              (j < size - 1 && cube[i][j + 1][k] != '_') ||
+              (k < size - 1 && cube[i][j][k + 1] != '_')) {
             // if I move here, will it complete a Utah?
             if ((move_for = check_from(cube, size, i, j, k))) {
               if (move_for == 'X') {
