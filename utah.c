@@ -316,7 +316,8 @@ int main(int argc, char **argv)
       fgetc(file);
 
       if (!find_move(cube, size)) {
-        sleep(1);
+        if (cube_count == 1)
+          sleep(1);
       }
 
       //if (cube_count == 6 && cube[1][2][2] == 'X')
