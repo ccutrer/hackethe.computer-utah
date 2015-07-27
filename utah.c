@@ -320,6 +320,7 @@ int main(int argc, char **argv)
           sleep(3);
       }
 
+
 //      if (cube_count == 2 && cube[2][1][2] == 'O')
 //        sleep(3);
       if (!first_cube) {
