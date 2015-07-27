@@ -223,7 +223,7 @@ char check_from(char ***cube, int size, int x, int y, int z)
       for (k = z - 2; k < z + 2 && k < size; ++k) {
         if (k < 0)
           continue;
-        if (cube[i][j][k] == '_')
+        if (cube[i][j][k] != 'X' && cube[i][j][k] != 'O')
           continue;
         cube[x][y][z] = 'X';
         if (check_from_frd(cube, size, i, j, k))
@@ -313,10 +313,14 @@ int main(int argc, char **argv)
       // blank newline
       fgetc(file);
 
-      find_move(cube, size);
+      //find_move(cube, size);
 
-      if (!first_cube)
+      if (cube[0][0][0] == 'X')
+        sleep(2);
+      if (!first_cube) {
+        return 1;
         putc('\n', stdout);
+      }
       first_cube = 0;
       for (i = 0; i < size; ++i) {
         if (i != 0)
