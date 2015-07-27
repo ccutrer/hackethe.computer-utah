@@ -315,8 +315,8 @@ int main(int argc, char **argv)
 
       //find_move(cube, size);
 
-      if (cube[0][1][1] == 'O')
-        sleep(2);
+      if (cube[0][1][2] == 'X')
+        sleep(3);
       if (!first_cube) {
         return 1;
         putc('\n', stdout);
