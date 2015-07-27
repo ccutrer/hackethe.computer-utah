@@ -59,13 +59,7 @@ int check_from_frd(char ***cube, int size, int x, int y, int z)
   real_middles_count = middles_count;
   CHECK_X(x - 1, y - 1);
   CHECK_X(x, y - 1);
-  CHECK_X(x + 1, y - 1);
-  CHECK_X(x + 1, y);
-  CHECK_X(x + 1, y + 1);
-  CHECK_X(x, y + 1);
-  CHECK_X(x - 1, y + 1);
-  CHECK_X(x - 1, y);
-  if (real_count >= 4 && middles_count >= 3 && max_contiguous >= 3)
+  if (real_count >= 4 && real_middles_count >= 3 && max_contiguous >= 3)
     return 1;
 
   count = 0;
@@ -85,13 +79,7 @@ CHECK_Y(y - 1, z);
 
   CHECK_Y(y - 1, z - 1);
 CHECK_Y(y, z - 1);
-CHECK_Y(y + 1, z - 1);
-CHECK_Y(y + 1, z);
-CHECK_Y(y + 1, z + 1);
-CHECK_Y(y, z + 1);
-CHECK_Y(y - 1, z + 1);
-CHECK_Y(y - 1, z);
-  if (real_count >= 4 && middles_count >= 3 && max_contiguous >= 3)
+  if (real_count >= 4 && real_middles_count >= 3 && max_contiguous >= 3)
     return 1;
 
   count = 0;
@@ -111,14 +99,8 @@ CHECK_Y(y - 1, z);
 
     CHECK_Z(x - 1, z - 1);
   CHECK_Z(x, z - 1);
-  CHECK_Z(x + 1, z - 1);
-  CHECK_Z(x + 1, z);
-  CHECK_Z(x + 1, z + 1);
-  CHECK_Z(x, z + 1);
-  CHECK_Z(x - 1, z + 1);
-  CHECK_Z(x - 1, z);
 
-  if (real_count >= 4 && middles_count >= 3 && max_contiguous >= 3)
+  if (real_count >= 4 && real_middles_count >= 3 && max_contiguous >= 3)
     return 1;
 
   return 0;
