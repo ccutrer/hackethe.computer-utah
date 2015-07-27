@@ -313,13 +313,13 @@ int main(int argc, char **argv)
       // blank newline
       fgetc(file);
 
-      //find_move(cube, size);
+      find_move(cube, size);
 
-
-      if (cube[2][2][2] == 'O')
-        sleep(3);
+sleep(1);
+      //if (cube[1][1][2] == 'O')
+        //sleep(3);
       if (!first_cube) {
-        return 1;
+        //return 1;
         putc('\n', stdout);
       }
       first_cube = 0;
