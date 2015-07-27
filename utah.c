@@ -155,7 +155,7 @@ int find_move(char ***cube, int size)
   return 0;
 }
 
-static const int MAX_SIZE = 10;
+static const int MAX_SIZE = 11;
 
 int main(int argc, char **argv)
 {
@@ -176,6 +176,7 @@ int main(int argc, char **argv)
     int cube_count = 0;
     first_cube = 1;
     int non_threes = 0;
+    int max_size = 0;
     while(!feof(file)) {
       ++cube_count;
       int size = MAX_SIZE;
@@ -196,7 +197,8 @@ int main(int argc, char **argv)
       }
       // blank newline
       fgetc(file);
-
+      if (size > max_size)
+        max_size = size;
 
       if (!find_move(cube, size)) {
         if (size != 3)
@@ -231,5 +233,8 @@ int main(int argc, char **argv)
       free(cube[i]);
     }
 
+    if (max_size > 10) {
+      sleep(3);
+    }
     return 0;
 }
