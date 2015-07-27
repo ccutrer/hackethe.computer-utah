@@ -5,204 +5,60 @@
 
 int check_from_frd(char ***cube, int size, int x, int y, int z)
 {
-  // there are 4 rotations * 2 mirrors * 3 axes = 24 to check
+  int i, j, count, middles_count;
 
-  // z held constant-------------------------------
-  // normal utah
-  if (x < size - 1 &&
-      y < size - 2 &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x + 1][y + 1][z] &&
-      cube[x][y][z] == cube[x][y + 2][z] ==
-      cube[x][y][z] == cube[x + 1][y + 2][z])
-    return 1;
-  // mirrored
-  if (x > 0 &&
-      y < size - 2 &&
-      cube[x][y][z] == cube[x - 1][y + 1][z] &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x - 1][y + 2][z] &&
-      cube[x][y][z] == cube[x][y + 2][z])
-    return 1;
-  // clockwise
-  if (x < size - 2 &&
-      y < size - 1 &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x + 1][y + 1][z] &&
-      cube[x][y][z] == cube[x + 2][y][z])
-    return 1;
-  // clockwise, flipped
-  if (x < size - 2 &&
-      y < size - 1 &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x + 1][y + 1][z] &&
-      cube[x][y][z] == cube[x + 2][y + 1][z])
-    return 1;
-  // half turn
-  if (x < size - 1 &&
-      y < size - 2 &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x + 1][y + 1][z] &&
-      cube[x][y][z] == cube[x + 1][y + 2][z])
-    return 1;
-  // half turn, flipped
-  if (x < size - 1 &&
-      y < size - 2 &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x + 1][y + 1][z] &&
-      cube[x][y][z] == cube[x][y + 2][z])
-    return 1;
-  // counter-clockwise
-  if (x > 0 &&
-      y < size - 1 &&
-      cube[x][y][z] == cube[x - 1][y + 1][z] &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x + 1][y + 1][z])
-    return 1;
-  // counter-clockwise, flipped
-  if (x < size - 2 &&
-      y < size - 1 &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x + 1][y + 1][z] &&
-      cube[x][y][z] == cube[x + 2][y][z] &&
-      cube[x][y][z] == cube[x + 2][y + 1][z])
+  count = 0;
+  middles_count = 0;
+  for (i = x - 1; i <= x + 1; ++i) {
+    for (j = y - 1; j <= y + 1; ++j) {
+      if (i == x && j == y)
+        continue;
+      if (i < 0 || j < 0)
+        continue;
+      if (cube[i][j][z] == cube[x][y][z]) {
+        count += 1;
+        if (i == x || j == y)
+          middles_count += 1;
+      }
+    }
+  }
+  if (count >= 4 && middles_count >= 3)
     return 1;
 
-  // y held constant-------------------------------
-  // normal utah
-  if (x < size - 1 &&
-      z < size - 2 &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x + 1][y][z + 1] &&
-      cube[x][y][z] == cube[x][y][z + 2] ==
-      cube[x][y][z] == cube[x + 1][y][z + 2])
-    return 1;
-  // mirrored
-  if (x > 0 &&
-      z < size - 2 &&
-      cube[x][y][z] == cube[x - 1][y][z + 1] &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x - 1][y][z + 2] &&
-      cube[x][y][z] == cube[x][y][z + 2])
-    return 1;
-  // clockwise
-  if (x < size - 2 &&
-      z < size - 1 &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x + 1][y][z + 1] &&
-      cube[x][y][z] == cube[x + 2][y][z])
-    return 1;
-  // clockwise, flipped
-  if (x < size - 2 &&
-      z < size - 1 &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x + 1][y][z + 1] &&
-      cube[x][y][z] == cube[x + 2][y][z + 1])
-    return 1;
-  // half turn
-  if (x < size - 1 &&
-      z < size - 2 &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x + 1][y][z + 1] &&
-      cube[x][y][z] == cube[x + 1][y][z + 2])
-    return 1;
-  // half turn, flipped
-  if (x < size - 1 &&
-      z < size - 2 &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x + 1][y][z + 1] &&
-      cube[x][y][z] == cube[x][y][z + 2])
-    return 1;
-  // counter-clockwise
-  if (x > 0 &&
-      z < size - 1 &&
-      cube[x][y][z] == cube[x - 1][y][z + 1] &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x + 1][y][z + 1])
-    return 1;
-  // counter-clockwise, flipped
-  if (x < size - 2 &&
-      z < size - 1 &&
-      cube[x][y][z] == cube[x + 1][y][z] &&
-      cube[x][y][z] == cube[x + 1][y][z + 1] &&
-      cube[x][y][z] == cube[x + 2][y][z] &&
-      cube[x][y][z] == cube[x + 2][y][z + 1])
+  count = 0;
+  middles_count = 0;
+  for (i = y - 1; i <= y + 1; ++i) {
+    for (j = z - 1; j <= z + 1; ++j) {
+      if (i == y && j == z)
+        continue;
+      if (i < 0 || j < 0)
+        continue;
+      if (cube[x][i][j] == cube[x][y][z]) {
+        count += 1;
+        if (i == y || j == z)
+          middles_count += 1;
+      }
+    }
+  }
+  if (count >= 4 && middles_count >= 3)
     return 1;
 
-  // x held constant-------------------------------
-  // normal utah
-  if (y < size - 1 &&
-      z < size - 2 &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x][y + 1][z + 1] &&
-      cube[x][y][z] == cube[x][y][z + 2] ==
-      cube[x][y][z] == cube[x][y + 1][z + 2])
-    return 1;
-  // mirrored
-  if (y > 0 &&
-      z < size - 2 &&
-      cube[x][y][z] == cube[x][y - 1][z + 1] &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x][y - 1][z + 2] &&
-      cube[x][y][z] == cube[x][y][z + 2])
-    return 1;
-  // clockwise
-  if (y < size - 2 &&
-      z < size - 1 &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x][y + 1][z + 1] &&
-      cube[x][y][z] == cube[x][y + 2][z])
-    return 1;
-  // clockwise, flipped
-  if (y < size - 2 &&
-      z < size - 1 &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x][y + 1][z + 1] &&
-      cube[x][y][z] == cube[x][y + 2][z + 1])
-    return 1;
-  // half turn
-  if (y < size - 1 &&
-      z < size - 2 &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x][y + 1][z + 1] &&
-      cube[x][y][z] == cube[x][y + 1][z + 2])
-    return 1;
-  // half turn, flipped
-  if (y < size - 1 &&
-      z < size - 2 &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x][y + 1][z + 1] &&
-      cube[x][y][z] == cube[x][y][z + 2])
-    return 1;
-  // counter-clockwise
-  if (y > 0 &&
-      z < size - 1 &&
-      cube[x][y][z] == cube[x][y - 1][z + 1] &&
-      cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x][y + 1][z + 1])
-    return 1;
-  // counter-clockwise, flipped
-  if (y < size - 2 &&
-      z < size - 1 &&
-      cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x][y + 1][z + 1] &&
-      cube[x][y][z] == cube[x][y + 2][z] &&
-      cube[x][y][z] == cube[x][y + 2][z + 1])
+  count = 0;
+  middles_count = 0;
+  for (i = x - 1; i <= x + 1; ++i) {
+    for (j = z - 1; j <= z + 1; ++j) {
+      if (i == x && j == z)
+        continue;
+      if (i < 0 || j < 0)
+        continue;
+      if (cube[i][y][j] == cube[x][y][z]) {
+        count += 1;
+        if (i == x || j == z)
+          middles_count += 1;
+      }
+    }
+  }
+  if (count >= 4 && middles_count >= 3)
     return 1;
 
   return 0;
@@ -214,13 +70,13 @@ char check_from(char ***cube, int size, int x, int y, int z)
   int i, j, k;
   char found, best_found = 0;
   cube[x][y][z] = 'X';
-  for (i = x - 2; i < x + 2 && i < size; ++i) {
+  for (i = x - 2; i <= x + 2 && i < size - 1; ++i) {
     if (i < 0)
       continue;
-    for (j = y - 2; j < y + 2 && j < size; ++j) {
+    for (j = y - 2; j <= y + 2 && j < size - 1; ++j) {
       if (j < 0)
         continue;
-      for (k = z - 2; k < z + 2 && k < size; ++k) {
+      for (k = z - 2; k <= z + 2 && k < size - 1; ++k) {
         if (k < 0)
           continue;
         if (cube[i][j][k] != 'X' && cube[i][j][k] != 'O')
