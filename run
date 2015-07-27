@@ -7,6 +7,6 @@ lines = file.read
 number_of_cubes = lines.split("\n\n").length
 puts number_of_cubes
 
-if number_of_cubes >= 100
+if number_of_cubes >= 1000
   sleep 5
 end
