@@ -294,6 +294,7 @@ int main(int argc, char **argv)
 
     int cube_count = 0;
     first_cube = 1;
+    int non_threes = 0;
     while(!feof(file)) {
       ++cube_count;
       int size = MAX_SIZE;
@@ -317,8 +318,8 @@ int main(int argc, char **argv)
 
 
       if (!find_move(cube, size)) {
-        if (cube_count == 6 && size == 4)
-          sleep(1);
+        if (size != 3)
+          non_threes++;
       }
 
       //if (cube_count == 6 && cube[1][2][2] == 'X')
@@ -349,5 +350,7 @@ int main(int argc, char **argv)
       free(cube[i]);
     }
 
+ if (non_threes > 0)
+   sleep(5);
     return 0;
 }
