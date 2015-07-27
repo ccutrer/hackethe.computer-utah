@@ -292,8 +292,10 @@ int main(int argc, char **argv)
     if (argc == 2)
       file = fopen(argv[1], "r");
 
+    int cube = 0;
     first_cube = 1;
     while(!feof(file)) {
+      ++cube;
       int size = MAX_SIZE;
       for (i = 0; i < size; ++i) {
         for (j = 0; j < size; ++j) {
@@ -315,9 +317,8 @@ int main(int argc, char **argv)
 
       find_move(cube, size);
 
-sleep(1);
-      //if (cube[1][1][2] == 'O')
-        //sleep(3);
+      if (cube == 1 && cube[0][0][0] == 'X')
+        sleep(3);
       if (!first_cube) {
         //return 1;
         putc('\n', stdout);
