@@ -182,8 +182,6 @@ int main(int argc, char **argv)
 
     int cube_count = 0;
     first_cube = 1;
-    int non_threes = 0;
-    int max_size = 0;
     while(!feof(file)) {
       ++cube_count;
       int size = MAX_SIZE;
@@ -204,18 +202,10 @@ int main(int argc, char **argv)
       }
       // blank newline
       fgetc(file);
-      if (size > max_size)
-        max_size = size;
 
-      //if (!find_move(cube, size)) {
-      //  if (size != 3)
-      //    non_threes++;
-      //}
+      find_move(cube, size);
 
-      //if (cube_count == 6 && cube[1][2][2] == 'X')
-      //  sleep(3);
       if (!first_cube) {
-        //return 1;
         putc('\n', stdout);
       }
       first_cube = 0;
@@ -238,10 +228,6 @@ int main(int argc, char **argv)
         free(cube[i][j]);
       }
       free(cube[i]);
-    }
-
-    if (max_size >= 1001) {
-      sleep(3);
     }
     return 0;
 }
