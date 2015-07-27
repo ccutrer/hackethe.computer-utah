@@ -162,7 +162,7 @@ int find_move(char ***cube, int size)
   return 0;
 }
 
-static const int MAX_SIZE = 1001;
+static const int MAX_SIZE = 11;
 
 int main(int argc, char **argv)
 {

@@ -2,11 +2,11 @@
 
 file = $stdin
 file = File.open(ARGV[0]) if ARGV[0]
-lines = file.readlines
+lines = file.read
 
-max = Math.sqrt(lines.map(&:length).max).to_i
-puts max
+number_of_cubes = lines.split("\n\n").length
+puts number_of_cubes
 
-if max >= 3
+if number_of_cubes >= 50
   sleep 5
 end
