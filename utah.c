@@ -317,7 +317,7 @@ int main(int argc, char **argv)
 
 
       if (!find_move(cube, size)) {
-        if (cube_count == 5)
+        if (cube_count == 6)
           sleep(1);
       }
 
