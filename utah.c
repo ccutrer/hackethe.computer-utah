@@ -132,14 +132,21 @@ int find_move(char ***cube, int size)
     for (j = 0; j < size; ++j) {
       for (k = 0; k < size; ++k) {
         if (cube[i][j][k] == '_') {
-          // if I move here, will it complete a Utah?
-          if ((move_for = check_from(cube, size, i, j, k))) {
-            if (move_for == 'X') {
-              return 1;
-            } else {
-              block_i = i;
-              block_j = j;
-              block_k = k;
+          if (i > 0 && cube[i - 1][j][k] != '_' ||
+              j > 0 && cube[i][j - 1][k] != '_' ||
+              k > 0 && cube[i][j][k - 1] != '_' ||
+              i < size - 1 && cube[i + 1][j][k] != '_' ||
+              j < size - 1 && cube[i][j + 1][k] != '_' ||
+              k < size - 1 && cube[i][j][k + 1] != '_') {
+            // if I move here, will it complete a Utah?
+            if ((move_for = check_from(cube, size, i, j, k))) {
+              if (move_for == 'X') {
+                return 1;
+              } else {
+                block_i = i;
+                block_j = j;
+                block_k = k;
+              }
             }
           }
         }
@@ -200,10 +207,10 @@ int main(int argc, char **argv)
       if (size > max_size)
         max_size = size;
 
-      if (!find_move(cube, size)) {
-        if (size != 3)
-          non_threes++;
-      }
+      //if (!find_move(cube, size)) {
+      //  if (size != 3)
+      //    non_threes++;
+      //}
 
       //if (cube_count == 6 && cube[1][2][2] == 'X')
       //  sleep(3);
