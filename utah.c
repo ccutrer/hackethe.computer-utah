@@ -155,7 +155,7 @@ int find_move(char ***cube, int size)
   return 0;
 }
 
-static const int MAX_SIZE = 101;
+static const int MAX_SIZE = 1001;
 
 int main(int argc, char **argv)
 {
@@ -233,7 +233,7 @@ int main(int argc, char **argv)
       free(cube[i]);
     }
 
-    if (max_size >= 100) {
+    if (max_size >= 1001) {
       sleep(3);
     }
     return 0;
