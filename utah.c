@@ -3,62 +3,89 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define CHECK_X(i, j) \
+  if (i >= 0 && j >= 0 && cube[i][j][z] == cube[x][y][z]) { \
+    contiguous += 1; \
+    if (max_contiguous < contiguous) \
+      max_contiguous = contiguous; \
+    count += 1; \
+    if (i == x || j == y) \
+      middles_count += 1; \
+  } else { \
+    contiguous = 0; \
+  }
+
+#define CHECK_Y(i, j) \
+  if (i >= 0 && j >= 0 && cube[x][i][j] == cube[x][y][z]) { \
+    contiguous += 1; \
+    if (max_contiguous < contiguous) \
+      max_contiguous = contiguous; \
+    count += 1; \
+    if (i == y || j == z) \
+      middles_count += 1; \
+  } else { \
+    contiguous = 0; \
+  }
+
+#define CHECK_Z(i, j) \
+  if (i >= 0 && j >= 0 && cube[i][y][j] == cube[x][y][z]) { \
+    contiguous += 1; \
+    if (max_contiguous < contiguous) \
+      max_contiguous = contiguous; \
+    count += 1; \
+    if (i == x || j == z) \
+      middles_count += 1; \
+  } else { \
+    contiguous = 0; \
+  }
+
 int check_from_frd(char ***cube, int size, int x, int y, int z)
 {
-  int i, j, count, middles_count;
+  int count, middles_count, contiguous, max_contiguous;
 
   count = 0;
   middles_count = 0;
-  for (i = x - 1; i <= x + 1; ++i) {
-    for (j = y - 1; j <= y + 1; ++j) {
-      if (i == x && j == y)
-        continue;
-      if (i < 0 || j < 0)
-        continue;
-      if (cube[i][j][z] == cube[x][y][z]) {
-        count += 1;
-        if (i == x || j == y)
-          middles_count += 1;
-      }
-    }
-  }
-  if (count >= 4 && middles_count >= 3)
+  contiguous = 0;
+  max_contiguous = 0;
+  CHECK_X(x - 1, y - 1);
+  CHECK_X(x, y - 1);
+  CHECK_X(x + 1, y - 1);
+  CHECK_X(x + 1, y);
+  CHECK_X(x + 1, y + 1);
+  CHECK_X(x, y + 1);
+  CHECK_X(x - 1, y);
+  CHECK_X(x - 1, y - 1);
+  if (count >= 4 && middles_count >= 3 && max_contiguous >= 3)
     return 1;
 
   count = 0;
   middles_count = 0;
-  for (i = y - 1; i <= y + 1; ++i) {
-    for (j = z - 1; j <= z + 1; ++j) {
-      if (i == y && j == z)
-        continue;
-      if (i < 0 || j < 0)
-        continue;
-      if (cube[x][i][j] == cube[x][y][z]) {
-        count += 1;
-        if (i == y || j == z)
-          middles_count += 1;
-      }
-    }
-  }
-  if (count >= 4 && middles_count >= 3)
+  contiguous = 0;
+  max_contiguous = 0;
+CHECK_Y(y - 1, z - 1);
+CHECK_Y(y, z - 1);
+CHECK_Y(y + 1, z - 1);
+CHECK_Y(y + 1, z);
+CHECK_Y(y + 1, z + 1);
+CHECK_Y(y, z + 1);
+CHECK_Y(y - 1, z);
+CHECK_Y(y - 1, z - 1);
+  if (count >= 4 && middles_count >= 3 && max_contiguous >= 3)
     return 1;
 
   count = 0;
   middles_count = 0;
-  for (i = x - 1; i <= x + 1; ++i) {
-    for (j = z - 1; j <= z + 1; ++j) {
-      if (i == x && j == z)
-        continue;
-      if (i < 0 || j < 0)
-        continue;
-      if (cube[i][y][j] == cube[x][y][z]) {
-        count += 1;
-        if (i == x || j == z)
-          middles_count += 1;
-      }
-    }
-  }
-  if (count >= 4 && middles_count >= 3)
+    contiguous = 0;
+    max_contiguous = 0;
+  CHECK_Z(x - 1, z - 1);
+  CHECK_Z(x, z - 1);
+  CHECK_Z(x + 1, z - 1);
+  CHECK_Z(x + 1, z);
+  CHECK_Z(x + 1, z + 1);
+  CHECK_Z(x, z + 1);
+  CHECK_Z(x - 1, z);
+  CHECK_Z(x - 1, z - 1);
+  if (count >= 4 && middles_count >= 3 && max_contiguous >= 3)
     return 1;
 
   return 0;
