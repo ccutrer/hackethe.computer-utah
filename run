@@ -8,6 +8,6 @@ number_of_cubes = lines.split("\n\n").length
 puts number_of_cubes
 
 
-if number_of_cubes >= 750
+if number_of_cubes >= 600
   sleep 5
 end
