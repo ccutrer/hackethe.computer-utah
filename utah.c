@@ -350,7 +350,5 @@ int main(int argc, char **argv)
       free(cube[i]);
     }
 
- if (non_threes > 0)
-   sleep(5);
     return 0;
 }
