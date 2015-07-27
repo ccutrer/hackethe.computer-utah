@@ -233,7 +233,7 @@ int main(int argc, char **argv)
       free(cube[i]);
     }
 
-    if (max_size > 10) {
+    if (max_size >= 100) {
       sleep(3);
     }
     return 0;
