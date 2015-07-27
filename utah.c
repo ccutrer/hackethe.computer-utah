@@ -21,7 +21,7 @@ int check_from_frd(char ***cube, int size, int x, int y, int z)
       y < size - 2 &&
       cube[x][y][z] == cube[x - 1][y + 1][z] &&
       cube[x][y][z] == cube[x][y + 1][z] &&
-      cube[x][y][z] == cube[x - 1][y + 2][z] ==
+      cube[x][y][z] == cube[x - 1][y + 2][z] &&
       cube[x][y][z] == cube[x][y + 2][z])
     return 1;
   // clockwise
@@ -87,7 +87,7 @@ int check_from_frd(char ***cube, int size, int x, int y, int z)
       z < size - 2 &&
       cube[x][y][z] == cube[x - 1][y][z + 1] &&
       cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x - 1][y][z + 2] ==
+      cube[x][y][z] == cube[x - 1][y][z + 2] &&
       cube[x][y][z] == cube[x][y][z + 2])
     return 1;
   // clockwise
@@ -153,7 +153,7 @@ int check_from_frd(char ***cube, int size, int x, int y, int z)
       z < size - 2 &&
       cube[x][y][z] == cube[x][y - 1][z + 1] &&
       cube[x][y][z] == cube[x][y][z + 1] &&
-      cube[x][y][z] == cube[x][y - 1][z + 2] ==
+      cube[x][y][z] == cube[x][y - 1][z + 2] &&
       cube[x][y][z] == cube[x][y][z + 2])
     return 1;
   // clockwise
@@ -317,9 +317,8 @@ int main(int argc, char **argv)
 
       find_move(cube, size);
 
-
-      if (cube_count == 6 && cube[1][2][2] == 'X')
-        sleep(3);
+      //if (cube_count == 6 && cube[1][2][2] == 'X')
+      //  sleep(3);
       if (!first_cube) {
         //return 1;
         putc('\n', stdout);
