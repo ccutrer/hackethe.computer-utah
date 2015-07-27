@@ -7,6 +7,6 @@ lines = file.readlines
 max = Math.sqrt(lines.map(&:length).max).to_i
 puts max
 
-if max >= 11
+if max >= 5
   sleep 5
 end
