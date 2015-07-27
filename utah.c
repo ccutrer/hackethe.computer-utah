@@ -315,11 +315,10 @@ int main(int argc, char **argv)
       // blank newline
       fgetc(file);
 
-      if (!find_move(cube, size))
-        sleep(1);
+      find_move(cube, size);
 
-      //if (cube_count == 2 && cube[2][2][1] == 'X')
-        //sleep(3);
+      if (cube_count == 2 && cube[0][1][2] == 'O')
+        sleep(3);
       if (!first_cube) {
         //return 1;
         putc('\n', stdout);
